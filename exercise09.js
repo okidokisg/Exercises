@@ -14,6 +14,7 @@
 var cities = [ "New Orleans", "Denver", "Cebu City", "Bangkok", "Singapore" ];
 
 function reverseArray(arr) {
+	console.log(Array.isArray(arr));
 	arr.reverse();
 	return arr;
 };
