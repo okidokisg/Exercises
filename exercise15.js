@@ -21,6 +21,7 @@ function colWidths(rows) {
 function drawTable(rows) {
 	var heights = rowHeights(rows);
 	var widths = colWidths(rows);
+	console.log(widths);
 	function drawLine(blocks, lineNo) {
 		return blocks.map(function(block) {
 			return block[lineNo];
@@ -28,9 +29,13 @@ function drawTable(rows) {
 	}
 
 	function drawRow(row, rowNum) {
+		console.log(row, rowNum);
 		var blocks = row.map(function(cell, colNum) {
+			console.log(cell, colNum);
+			
 			return cell.draw(widths[colNum], heights[rowNum]);
 		});
+		console.log(blocks);
 		return blocks[0].map(function(_, lineNo) {
 			return drawLine(blocks, lineNo);
 		}).join("\n");
@@ -86,6 +91,7 @@ TextCell.prototype.draw = function(width, height) {
 		var line = this.text[i] || "";
 		result.push(line + repeat(" ", width - line.length));
 	}
+	console.log(result);
 	return result;
 };
 // --------------------------------------------------
@@ -121,11 +127,11 @@ function dataTable(data) {
 			else
 				return new TextCell(String(value));
 		});
-	});	
-//	console.log(keys[0]);
-//	console.log(headers[0]);
-//	console.log(body[0]);
-//	console.log([ headers[0] ].concat(body[0]));
+	});
+	// console.log(keys[0]);
+//	 console.log(headers);
+//	 console.log(body[0]);
+//	 console.log([ headers[0] ].concat(body[0]));
 	return [ headers ].concat(body);
 }
 // --------------------------------------------------
