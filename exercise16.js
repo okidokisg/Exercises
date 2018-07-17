@@ -1,99 +1,96 @@
 var data = require("./vehicledata");
-//--------------------------------------------------
+// --------------------------------------------------
 function Cell(text, add) {
+	var type = typeof text;
+	text = text.toString();
 	if (add > 0) {
-		for (let i = 1; i <= add; i++)
-			text += " ";
+		for (let i = 1; i <= add; i++) {
+			if (type === "number")
+				text = " " + text;
+			else
+				text += " ";
+		}
 	}
-	this.text = text.split("\h");
+	this.text = text.split('\n');
 };
-
 Cell.prototype.draw = function() {
-	// console.log(this.text);
-	// return this.text.reduce((a,b)=> a);
+	return this.text[0];
 };
-//--------------------------------------------------
+// --------------------------------------------------
 function Header(headertext, add) {
+	this.content = headertext;
+};
+Header.prototype.draw = function() {
+	return this.content.text[0].toUpperCase();
+};
+// --------------------------------------------------
+function HeadLin(headertext, add) {
 	var newtxt = "";
 	if (add > 0) {
 		for (let i = 1; i <= add; i++)
 			newtxt += "-";
-	};
-	headertext.text.push(newtxt);
+	}
+	headertext.text[0] = newtxt;
 	this.content = headertext;
 };
-//--------------------------------------------------
-function verifyData(data) {
-	var error = 0;
-	var key = Object.keys(data[0]);
-	key.forEach(function(element) {
-		data.forEach(function(line) {
-			if (!(element in line))
-				error = 1;
-		});
-	});
-	if (error == 1)
-		return "error";
-	else
-		return data;
+HeadLin.prototype.draw = function() {
+	return this.content.text[0];
 };
-
-//--------------------------------------------------
+// --------------------------------------------------
 function createTable(data) {
-	if (data == "error")
-		return ("Data corrupt!");
-
 	var key = Object.keys(data[0]);
-// (1) Create array of column widths
+
+	// (1) Create array of column widths
 	var widths = key.map(function(element) {
-		var maxWidth = 0;
-		data.reduce(function(max, cur) {
+		var maxWidth = element.length;
+		data.forEach(function(cur) {
 			var curLen = cur[element].toString().length;
-			var maxLen = max[element].toString().length;
-			if (curLen > maxLen) {
+			if (curLen > maxWidth)
 				maxWidth = curLen;
-				return cur;
-			} else {
-				maxWidth = maxLen;
-				return max;
-			}
 		});
 		return maxWidth;
 	});
-// (2) Headers array
+
+	// (2) Headers array
 	var cnt = 0;
 	var header = key.map(function(element) {
 		var width = widths[cnt];
-		var widthdiff = width - (element.toString().length);	
+		var widthdiff = width - (element.toString().length);
 		cnt++;
 		return new Header(new Cell(element.toString(), widthdiff), width);
 	});
-// (3) Main data array
+
+	// (3) Header lines array
+	cnt = 0;
+	var headlin = key.map(function(element) {
+		var width = widths[cnt];
+		var widthdiff = width - (element.toString().length);
+		cnt++;
+		return new HeadLin(new Cell(element.toString(), widthdiff), width);
+	});
+
+	// (4) Main data array
 	var main = data.map(function(line) {
 		var cnt = 0;
 		return key.map(function(element) {
 			var width = widths[cnt];
 			cnt++;
 			var spaces = (width - line[element].toString().length);
-			return new Cell(line[element].toString(), spaces);
+			// return new Cell(line[element].toString(), spaces);
+			return new Cell(line[element], spaces);
 		});
 	});
-	return [ header ].concat(main);
+	return [ header ].concat([ headlin ], main);
 };
-//--------------------------------------------------
+// --------------------------------------------------
 function writeTable(data) {
-	console.log(data);
-	return data[0].map(function(_x, i) {
-		console.log(i);
-		return data.reduce(function(max, row) {
-			console.log(row[i]);
-		}, 0);
-	});
-	
-	// return data.map(function(row) {
-	// console.log(row);
-	// return row.draw();
-	// })
+	data.map(function(row) {
+		var newArr = [];
+		row.map(function(line) {
+			newArr.push(line.draw());
+		})
+		console.log(newArr.join("  "));
+	})
 };
-//--------------------------------------------------
-console.log(writeTable(createTable(verifyData(data))));
+// --------------------------------------------------
+writeTable(createTable(data));
